@@ -38,4 +38,40 @@ void main() {
 
     expect(() => lms.removeCourse('c2'), throwsException);
   });
+
+  test("Student enroll success", () {
+    final lms = LmsSystem();
+
+    lms.addStudent(studentId: 's1', studentName: 'nana');
+    lms.addCourse(courseId: 'c1', courseName: 'dart');
+    lms.enrollStudent('s1', 'c1');
+
+    expect(lms.courses.firstWhere((c) => c.id == 'c1').studentIds.contains('s1'), isTrue);
+  });
+
+  test("Student duplicated enrollment", () {
+    final lms = LmsSystem();
+
+    lms.addStudent(studentId: 's1', studentName: 'nana');
+    lms.addCourse(courseId: 'c1', courseName: 'dart');
+    lms.enrollStudent('s1', 'c1');
+
+    expect(() => lms.enrollStudent('s1', 'c1'), throwsException);
+  });
+
+  test("Student enroll to nonexist course", () {
+    final lms = LmsSystem();
+
+    lms.addStudent(studentId: 's1', studentName: 'nana');
+
+    expect(() => lms.enrollStudent('s1', 'c1'), throwsException);
+  });
+
+  test("Nonexist student enrollment", () {
+    final lms = LmsSystem();
+
+    lms.addCourse(courseId: 'c1', courseName: 'dart');
+
+    expect(() => lms.enrollStudent('s1', 'c1'), throwsException);
+  });
  }

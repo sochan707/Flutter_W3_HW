@@ -1,4 +1,4 @@
-import 'package:lms_layered_architecture_example/model/course.dart';
+// import 'package:lms_layered_architecture_example/model/course.dart';
 
 class Score {
   final int id;
