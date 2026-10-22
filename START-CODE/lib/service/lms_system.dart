@@ -2,11 +2,13 @@ import 'package:lms_layered_architecture_example/model/score.dart';
 
 import '../model/student.dart';
 import '../model/course.dart';
+import '../model/Result.dart';
 
 class LmsSystem {
   final List<Student> students = [];
   final List<Course> courses = [];
   final List<Score> scores = [];
+  final List<Result> results = [];
  
   void addStudent({required String studentId, required String studentName}) {
     // ! Student shall not exist already
@@ -43,6 +45,16 @@ class LmsSystem {
         return c;
       }
     }
+    return null;
+  }
+
+  Result? _findResult({required String courseId, required String studentId}){
+    for(var r in results){
+      if(r.courseId == courseId && r.studentId == studentId){
+        return r;
+      }
+    }
+
     return null;
   }
 
@@ -110,5 +122,31 @@ class LmsSystem {
     }
   }
 
-  
+  void addResult(String studentId, String courseId, int score){
+    Student? student = _findStudentOrNull(studentId);
+    Course? course = _findCourse(courseId: courseId);
+    Result? result = _findResult(courseId: courseId, studentId: studentId);
+    bool studentIsEnrolled = courses.any((c) => c.id == courseId && c.studentIds.contains(studentId));
+
+    if(course == null){
+      throw Exception("This course does not exist");
+    } else if (student == null){
+      throw Exception("Student does not exist");
+    }
+
+    if(!studentIsEnrolled){
+      throw Exception("Student $studentId is not in course $courseId");
+    }
+
+    if(score < 0 || score > 100){
+      throw Exception("The score must be between 0-100");
+    }
+
+    if(result == null){
+      results.add(Result(studentId: studentId, courseId: courseId, score: score));
+    } else {
+      throw Exception("The result is already exist");
+    }
+    
+  }
 }

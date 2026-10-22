@@ -137,4 +137,23 @@ void main() {
     expect(lms.courses.firstWhere((c) => c.id == 'c1').studentIds.contains('s1'), isTrue);
     expect(lms.courses.firstWhere((c) => c.id == 'c3').studentIds.contains('s1'), isTrue);
   });
+
+  test("Add result success", (){
+    final lms = LmsSystem();
+
+    lms.addStudent(studentId: 's1', studentName: 'mimi');
+    lms.addStudent(studentId: 's2', studentName: 'vivi');
+    lms.addCourse(courseId: 'c1', courseName: 'dart');
+    lms.enrollStudent('s1', 'c1');
+
+    lms.addResult('s1', 'c1', 27);
+
+
+    expect(lms.results.any((r) => r.courseId == 'c1' && r.studentId == 's1' && r.score == 27), isTrue);
+    expect(() => lms.addResult('s1', 'c1', 78), throwsException);
+    expect(() => lms.addResult('s3', 'c1', 78), throwsException);
+    expect(() => lms.addResult('s2', 'c1', 76), throwsException);
+    expect(() => lms.addResult('s2', 'c1', 780), throwsException);
+    expect(() => lms.addResult('s1', 'c1', 80), throwsException);
+  });
 }
