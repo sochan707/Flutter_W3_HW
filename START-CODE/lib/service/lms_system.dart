@@ -122,7 +122,7 @@ class LmsSystem {
     }
   }
 
-  void addResult(String studentId, String courseId, int score){
+  void addResult(String resultId, String studentId, String courseId, int score){
     Student? student = _findStudentOrNull(studentId);
     Course? course = _findCourse(courseId: courseId);
     Result? result = _findResult(courseId: courseId, studentId: studentId);
@@ -143,10 +143,22 @@ class LmsSystem {
     }
 
     if(result == null){
-      results.add(Result(studentId: studentId, courseId: courseId, score: score));
+      results.add(Result(resultId: resultId, studentId: studentId, courseId: courseId, score: score));
     } else {
       throw Exception("The result is already exist");
     }
     
   }
+
+  void removeResult(String resultId){
+    bool resultExist = results.any((r) => r.resultId == resultId);
+    if (resultExist){
+      results.removeWhere((r) => r.resultId == resultId);
+    } else {
+      throw Exception("Result does not exist.");
+    }
+  
+  }
+
+
 }

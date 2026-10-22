@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:lms_layered_architecture_example/model/score.dart';
 import 'package:test/test.dart';
 
@@ -146,14 +148,38 @@ void main() {
     lms.addCourse(courseId: 'c1', courseName: 'dart');
     lms.enrollStudent('s1', 'c1');
 
-    lms.addResult('s1', 'c1', 27);
+    lms.addResult('r1', 's1', 'c1', 27);
 
 
     expect(lms.results.any((r) => r.courseId == 'c1' && r.studentId == 's1' && r.score == 27), isTrue);
-    expect(() => lms.addResult('s1', 'c1', 78), throwsException);
-    expect(() => lms.addResult('s3', 'c1', 78), throwsException);
-    expect(() => lms.addResult('s2', 'c1', 76), throwsException);
-    expect(() => lms.addResult('s2', 'c1', 780), throwsException);
-    expect(() => lms.addResult('s1', 'c1', 80), throwsException);
+    expect(() => lms.addResult('r1', 's1', 'c1', 78), throwsException);
+    expect(() => lms.addResult('r2', 's3', 'c1', 78), throwsException);
+    expect(() => lms.addResult('r3', 's2', 'c1', 76), throwsException);
+    expect(() => lms.addResult('r4', 's2', 'c1', 780), throwsException);
+    expect(() => lms.addResult('r5', 's1', 'c1', 80), throwsException);
+  });
+
+  test("Remove an existing result", (){
+    final lms = LmsSystem();
+
+    lms.addStudent(studentId: 's1', studentName: 'mimi');
+
+    lms.addCourse(courseId: 'c1', courseName: 'reactjs');
+    lms.addCourse(courseId: 'c2', courseName: 'dart');
+
+    lms.enrollStudent('s1', 'c1');
+    lms.enrollStudent('s1', 'c2');
+    
+    lms.addResult('r1', 's1', 'c1', 27);
+    lms.addResult('r2', 's1', 'c2', 78);
+
+    lms.removeResult('r1');
+
+    expect(lms.results.any((r) => r.resultId == 'r1'), isFalse);
+    expect(() => lms.removeResult('r1'), throwsException);
+    expect(lms.courses.any((c) => c.id == 'c1'), isTrue);
+    expect(lms.students.any((s) => s.id == 's1'), isTrue);
+    expect(lms.results.any((r) => r.resultId == 'r2' && r.courseId == 'c2' && r.score == 78 && r.studentId == 's1'), isTrue);
+
   });
 }
