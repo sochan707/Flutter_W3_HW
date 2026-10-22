@@ -27,6 +27,12 @@ class LmsSystem {
     }
     // 1- Remove student from the students list
     students.removeWhere((student) => student.id == studentId);
+    
+    for(var c in courses){
+      c.studentIds.removeWhere((s) => s == studentId);
+    }
+
+    results.removeWhere((r) => r.studentId == studentId);
  
   }
 
