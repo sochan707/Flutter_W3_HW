@@ -1,3 +1,4 @@
+import 'package:lms_layered_architecture_example/model/score.dart';
 import 'package:test/test.dart';
 
 import '../lib/service/lms_system.dart';
@@ -16,7 +17,7 @@ void main() {
     expect(lms.students.length, 0);
   });
 
-  test('create course', (){
+  test('create course', () {
     final lms = LmsSystem();
 
     lms.addCourse(courseId: 'c1', courseName: 'hello');
@@ -24,13 +25,13 @@ void main() {
     expect(lms.courses.any((course) => course.id == 'c1'), isTrue);
   });
 
-  test('duplicate course id', (){
+  test('duplicate course id', () {
     final lms = LmsSystem();
 
-    lms.addCourse(courseId: "c1" , courseName: "hi");
+    lms.addCourse(courseId: "c1", courseName: "hi");
 
-    expect(() => lms.addCourse(courseId: "c1" , courseName: "hi"), throwsException);
-    
+    expect(
+        () => lms.addCourse(courseId: "c1", courseName: "hi"), throwsException);
   });
 
   test("Remove none exist course", () {
@@ -46,7 +47,9 @@ void main() {
     lms.addCourse(courseId: 'c1', courseName: 'dart');
     lms.enrollStudent('s1', 'c1');
 
-    expect(lms.courses.firstWhere((c) => c.id == 'c1').studentIds.contains('s1'), isTrue);
+    expect(
+        lms.courses.firstWhere((c) => c.id == 'c1').studentIds.contains('s1'),
+        isTrue);
   });
 
   test("Student duplicated enrollment", () {
@@ -74,4 +77,64 @@ void main() {
 
     expect(() => lms.enrollStudent('s1', 'c1'), throwsException);
   });
- }
+
+  test("successful unenrollment", () {
+    final lms = LmsSystem();
+
+    lms.addStudent(studentId: 's1', studentName: 'nana');
+    lms.addCourse(courseId: 'c1', courseName: 'dart');
+    lms.enrollStudent('s1', 'c1');
+
+    lms.discardStudentFromCourse('s1', 'c1');
+
+    expect(lms.courses.any((c) => c.id == 'c1'), isTrue);
+    expect(lms.students.any((s) => s.id == 's1'), isTrue);
+    expect(
+        lms.courses.firstWhere((c) => c.id == 'c1').studentIds.contains('s1'),
+        isFalse);
+  });
+
+  test("Reject removal of a nonexistent enrollment", () {
+    final lms = LmsSystem();
+
+    lms.addStudent(studentId: 's1', studentName: 'nana');
+    lms.addCourse(courseId: 'c1', courseName: 'dart');
+
+    expect(() => lms.discardStudentFromCourse('s1', 'c1'), throwsException);
+  });
+
+  test("Testing score removal", () {
+    final lms = LmsSystem();
+
+    lms.addStudent(studentId: 's1', studentName: 'nana');
+    lms.addCourse(courseId: 'c1', courseName: 'dart');
+    lms.addCourse(courseId: 'c2', courseName: 'flutter');
+    lms.enrollStudent('s1', 'c1');
+    lms.enrollStudent('s1', 'c2');
+    lms.scores.add(Score(id: 1, score: 43, courseId: 'c1', studentId: 's1'));
+    lms.scores.add(Score(id: 2, score: 80, courseId: 'c2', studentId: 's1'));
+    lms.discardStudentFromCourse('s1', 'c1');
+
+    expect(lms.scores.any((s) => s.courseId == 'c1' && s.studentId == 's1'), isFalse);
+    expect(lms.scores.any((s) => s.courseId == 'c2' && s.studentId == 's1'), isTrue);
+  });
+
+  test("removing a student who has enrollments in multiple courses", (){
+    final lms = LmsSystem();
+
+    lms.addStudent(studentId: 's1', studentName: 'mimi');
+    lms.addCourse(courseId: 'c1', courseName: 'dart');
+    lms.addCourse(courseId: 'c2', courseName: 'reactjs');
+    lms.addCourse(courseId: 'c3', courseName: 'flutter');
+
+    lms.enrollStudent('s1', 'c1');
+    lms.enrollStudent('s1', 'c2');
+    lms.enrollStudent('s1', 'c3');
+
+    lms.discardStudentFromCourse('s1', 'c2');
+
+    expect(lms.courses.firstWhere((c) => c.id == 'c2').studentIds.contains('s1'), isFalse);
+    expect(lms.courses.firstWhere((c) => c.id == 'c1').studentIds.contains('s1'), isTrue);
+    expect(lms.courses.firstWhere((c) => c.id == 'c3').studentIds.contains('s1'), isTrue);
+  });
+}

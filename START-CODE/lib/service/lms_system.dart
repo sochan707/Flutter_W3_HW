@@ -87,4 +87,28 @@ class LmsSystem {
       throw Exception("student $studentId already enrolled.");
     }
   }
+
+  void discardStudentFromCourse(String studentId, String courseId){
+    Student? student = _findStudentOrNull(studentId);
+    Course? course = _findCourse(courseId: courseId);
+
+    if (course == null){
+      throw Exception("Course does not existed.");
+    }
+
+    if(student == null){
+      throw Exception("Student done not existed.");
+    }
+
+    bool studentInCourse = course.studentIds.any((id) => id == studentId);
+
+    if(!studentInCourse){
+      throw Exception("student $studentId is not in course $courseId");
+    } else {
+      scores.removeWhere((score) => score.studentId == studentId && score.courseId == courseId);
+      course.studentIds.remove(studentId);
+    }
+  }
+
+  
 }
